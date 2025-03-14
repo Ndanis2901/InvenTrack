@@ -22,7 +22,10 @@ export const registerUser = asyncHandler(async (req, res) => {
         dept: user.dept,
         procurement: user.procurement,
         isAdmin: user.isAdmin,
-    })
+    });
+  }else {
+    res.status(400);
+    throw new Error("invalid data try again")
   }
 });
 
