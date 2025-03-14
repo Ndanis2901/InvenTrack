@@ -1,5 +1,6 @@
 import User from "../models/userModal.js";
 import { asyncHandler } from "../utils/asynchandler.js";
+import generateToken from "../utils/generateToken.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, dept } = req.body;
@@ -15,6 +16,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   );
 
   if(user) {
+    generateToken(res, user._id);
     res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -29,3 +31,25 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+export const signIn = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (user && (await user.comparePassword(password))) {
+    const token = generateToken(res, user._id);
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      dept: user.dept,
+      isAdmin: user.isAdmin,
+      procurement: user.procurement,
+      token: token,
+    });
+  } else {
+    res.status(401);
+    throw new Error("invalid Email And Password !!");
+  }
+});
