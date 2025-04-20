@@ -70,7 +70,9 @@ const Products = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
+    if (
+      window.confirm("Are you sure you want to delete this pet food product?")
+    ) {
       removeProduct(id);
     }
   };
@@ -86,10 +88,10 @@ const Products = () => {
     <Layout>
       <div className="products-page">
         <div className="page-header">
-          <h1>Product Management</h1>
+          <h1>Pet Food Products</h1>
           {user && user.role === "admin" && (
             <Link to="/products/add" className="btn-add">
-              <i className="fas fa-plus"></i> Add Product
+              <i className="fas fa-plus"></i> Add Pet Food Product
             </Link>
           )}
         </div>
@@ -99,7 +101,7 @@ const Products = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search pet food products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -111,7 +113,7 @@ const Products = () => {
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
             >
-              <option value="">All Categories</option>
+              <option value="">All Pet Food Categories</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
@@ -136,16 +138,16 @@ const Products = () => {
                     SKU{getSortIndicator("sku")}
                   </th>
                   <th onClick={() => handleSort("category")}>
-                    Category{getSortIndicator("category")}
+                    Pet Food Type{getSortIndicator("category")}
                   </th>
                   <th onClick={() => handleSort("price")}>
                     Price{getSortIndicator("price")}
                   </th>
                   <th onClick={() => handleSort("quantity")}>
-                    Quantity{getSortIndicator("quantity")}
+                    Stock{getSortIndicator("quantity")}
                   </th>
                   <th onClick={() => handleSort("status")}>
-                    Status{getSortIndicator("status")}
+                    Seasonal Status{getSortIndicator("status")}
                   </th>
                   <th>Actions</th>
                 </tr>
@@ -162,6 +164,8 @@ const Products = () => {
                         className={
                           product.quantity < product.lowStockThreshold
                             ? "low-stock"
+                            : product.quantity > product.lowStockThreshold * 2
+                            ? "high-stock"
                             : ""
                         }
                       >
@@ -169,7 +173,9 @@ const Products = () => {
                       </td>
                       <td>
                         <span className={`status-badge ${product.status}`}>
-                          {product.status}
+                          {product.quantity > product.lowStockThreshold * 2
+                            ? "Seasonal Risk"
+                            : product.status}
                         </span>
                       </td>
                       <td className="actions">
@@ -201,7 +207,7 @@ const Products = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="no-results">
-                      No products found.
+                      No pet food products found.
                     </td>
                   </tr>
                 )}

@@ -31,7 +31,7 @@ const Dashboard = () => {
   const { products, loading, getLowStockProducts } = useContext(ProductContext);
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalValue, setTotalValue] = useState(0);
-  const [lowStockCount, setLowStockCount] = useState(0);
+  const [seasonalTrendRisk, setSeasonalTrendRisk] = useState(0);
   const [categories, setCategories] = useState([]);
   const [chartData, setChartData] = useState({
     labels: [],
@@ -46,7 +46,9 @@ const Dashboard = () => {
     if (products && products.length > 0) {
       // Calculate total counts
       setTotalProducts(products.length);
-      setLowStockCount(getLowStockProducts().length);
+
+      // Calculate products at seasonal risk (previously low stock)
+      setSeasonalTrendRisk(getLowStockProducts().length);
 
       // Calculate total inventory value
       const total = products.reduce(
@@ -68,7 +70,7 @@ const Dashboard = () => {
         labels: uniqueCategories,
         datasets: [
           {
-            label: "Products by Category",
+            label: "Pet Food Products by Category",
             data: categoryData,
             backgroundColor: [
               "rgba(255, 99, 132, 0.6)",
@@ -83,22 +85,36 @@ const Dashboard = () => {
         ],
       });
 
-      // Process data for line chart (mock sales data - in a real app this would come from actual sales)
-      const mockMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-      const mockSales = mockMonths.map(
-        () => Math.floor(Math.random() * 5000) + 1000
-      );
+      // Process data for line chart (seasonal trend data)
+      const seasons = [
+        "Winter",
+        "Spring",
+        "Summer",
+        "Fall",
+        "Winter",
+        "Spring",
+      ];
+
+      // Mock seasonal variation data - in a real app, this would be from actual sales data
+      const mockSeasonalData = [
+        Math.floor(Math.random() * 2000) + 3000, // Winter - higher
+        Math.floor(Math.random() * 1000) + 2000, // Spring - medium
+        Math.floor(Math.random() * 1000) + 1000, // Summer - lower
+        Math.floor(Math.random() * 1500) + 2500, // Fall - medium-high
+        Math.floor(Math.random() * 2000) + 3200, // Winter - higher
+        Math.floor(Math.random() * 1000) + 2100, // Spring - medium
+      ];
 
       setChartData({
-        labels: mockMonths,
+        labels: seasons,
         datasets: [
           {
-            label: "Sales in 2023",
-            data: mockSales,
+            label: "Seasonal Pet Food Demand",
+            data: mockSeasonalData,
             fill: false,
             backgroundColor: "rgba(75, 192, 192, 0.6)",
             borderColor: "rgba(75, 192, 192, 1)",
-            tension: 0.1,
+            tension: 0.3,
           },
         ],
       });
@@ -108,7 +124,7 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="dashboard">
-        <h1>Dashboard</h1>
+        <h1>Pet Food Trend Dashboard</h1>
 
         {loading ? (
           <div className="loading">Loading...</div>
@@ -117,9 +133,9 @@ const Dashboard = () => {
             {/* Stats Cards */}
             <div className="stats-container">
               <div className="stat-card">
-                <i className="fas fa-boxes stat-icon"></i>
+                <i className="fas fa-bone stat-icon"></i>
                 <div className="stat-info">
-                  <h3>Total Products</h3>
+                  <h3>Total Pet Food Products</h3>
                   <p className="stat-value">{totalProducts}</p>
                 </div>
               </div>
@@ -133,17 +149,17 @@ const Dashboard = () => {
               </div>
 
               <div className="stat-card">
-                <i className="fas fa-exclamation-triangle stat-icon"></i>
+                <i className="fas fa-temperature-high stat-icon"></i>
                 <div className="stat-info">
-                  <h3>Low Stock Items</h3>
-                  <p className="stat-value">{lowStockCount}</p>
+                  <h3>Seasonal Risk Items</h3>
+                  <p className="stat-value">{seasonalTrendRisk}</p>
                 </div>
               </div>
 
               <div className="stat-card">
                 <i className="fas fa-tags stat-icon"></i>
                 <div className="stat-info">
-                  <h3>Categories</h3>
+                  <h3>Pet Food Categories</h3>
                   <p className="stat-value">{categories.length}</p>
                 </div>
               </div>
@@ -152,27 +168,31 @@ const Dashboard = () => {
             {/* Charts Section */}
             <div className="charts-container">
               <div className="chart-card">
-                <h2>Sales Trend</h2>
+                <h2>Seasonal Demand Forecast</h2>
                 <Line data={chartData} />
               </div>
 
               <div className="chart-card">
-                <h2>Products by Category</h2>
+                <h2>Products by Pet Food Category</h2>
                 <Pie data={pieData} />
               </div>
             </div>
 
-            {/* Recent Activity / Low Stock Table */}
+            {/* Seasonal Risk Table */}
             <div className="data-container">
               <div className="data-card">
-                <h2>Low Stock Items</h2>
+                <h2>Seasonal Risk Items</h2>
+                <p className="seasonal-insight">
+                  Products that have potential overstocking risk based on
+                  upcoming seasonal trends.
+                </p>
                 <table className="dashboard-table">
                   <thead>
                     <tr>
                       <th>Product</th>
                       <th>SKU</th>
-                      <th>Quantity</th>
-                      <th>Threshold</th>
+                      <th>Current Stock</th>
+                      <th>Seasonal Trend</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -181,13 +201,17 @@ const Dashboard = () => {
                         <td>{product.name}</td>
                         <td>{product.sku}</td>
                         <td className="quantity-cell">{product.quantity}</td>
-                        <td>{product.lowStockThreshold}</td>
+                        <td>
+                          {product.quantity > product.lowStockThreshold * 2
+                            ? "Potential Overstock"
+                            : "Optimized"}
+                        </td>
                       </tr>
                     ))}
                     {getLowStockProducts().length === 0 && (
                       <tr>
                         <td colSpan="4" style={{ textAlign: "center" }}>
-                          No low stock items
+                          No seasonal risk items detected
                         </td>
                       </tr>
                     )}

@@ -8,11 +8,16 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { addProduct, loading } = useContext(ProductContext);
   const [categories, setCategories] = useState([
-    "Electronics",
-    "Clothing",
-    "Home Goods",
-    "Office Supplies",
-    "Food & Beverage",
+    "Dry Dog Food",
+    "Wet Dog Food",
+    "Dry Cat Food",
+    "Wet Cat Food",
+    "Puppy Food",
+    "Kitten Food",
+    "Senior Pet Food",
+    "Pet Treats",
+    "Prescription Diet",
+    "Organic Pet Food",
   ]);
 
   const [formData, setFormData] = useState({
@@ -21,11 +26,14 @@ const AddProduct = () => {
     category: "",
     price: "",
     quantity: "",
-    lowStockThreshold: "5",
+    lowStockThreshold: "10",
     description: "",
     location: "",
     status: "active",
     image: "",
+    seasonalTrend: "stable",
+    expirationDate: "",
+    ingredients: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -34,7 +42,7 @@ const AddProduct = () => {
   // Generate a unique SKU when component mounts
   useEffect(() => {
     const generateSKU = () => {
-      const prefix = "INV";
+      const prefix = "PET";
       const timestamp = Date.now().toString().slice(-6);
       const random = Math.floor(Math.random() * 1000)
         .toString()
@@ -85,13 +93,16 @@ const AddProduct = () => {
     }
 
     if (!formData.lowStockThreshold) {
-      newErrors.lowStockThreshold = "Low stock threshold is required";
+      newErrors.lowStockThreshold = "Stock threshold is required";
     } else if (
       isNaN(formData.lowStockThreshold) ||
       parseInt(formData.lowStockThreshold) < 0
     ) {
-      newErrors.lowStockThreshold =
-        "Low stock threshold must be a positive number";
+      newErrors.lowStockThreshold = "Stock threshold must be a positive number";
+    }
+
+    if (!formData.seasonalTrend) {
+      newErrors.seasonalTrend = "Seasonal trend is required";
     }
 
     setErrors(newErrors);
@@ -128,7 +139,7 @@ const AddProduct = () => {
             <Link to="/products" className="btn-back">
               <i className="fas fa-arrow-left"></i> Back to Products
             </Link>
-            <h1>Add New Product</h1>
+            <h1>Add New Pet Food Product</h1>
           </div>
         </div>
 
@@ -170,7 +181,7 @@ const AddProduct = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="category">Category*</label>
+                <label htmlFor="category">Pet Food Category*</label>
                 <select
                   id="category"
                   name="category"
@@ -198,7 +209,6 @@ const AddProduct = () => {
                     id="price"
                     name="price"
                     step="0.01"
-                    min="0"
                     value={formData.price}
                     onChange={handleChange}
                     className={errors.price ? "error" : ""}
@@ -209,41 +219,11 @@ const AddProduct = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="status">Status</label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="discontinued">Discontinued</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  rows="4"
-                  value={formData.description}
-                  onChange={handleChange}
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="form-column">
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="quantity">Quantity*</label>
+                  <label htmlFor="quantity">Stock Quantity*</label>
                   <input
                     type="number"
                     id="quantity"
                     name="quantity"
-                    min="0"
                     value={formData.quantity}
                     onChange={handleChange}
                     className={errors.quantity ? "error" : ""}
@@ -252,14 +232,15 @@ const AddProduct = () => {
                     <div className="error-message">{errors.quantity}</div>
                   )}
                 </div>
+              </div>
 
+              <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="lowStockThreshold">Low Stock Alert</label>
+                  <label htmlFor="lowStockThreshold">Minimum Stock*</label>
                   <input
                     type="number"
                     id="lowStockThreshold"
                     name="lowStockThreshold"
-                    min="0"
                     value={formData.lowStockThreshold}
                     onChange={handleChange}
                     className={errors.lowStockThreshold ? "error" : ""}
@@ -270,6 +251,66 @@ const AddProduct = () => {
                     </div>
                   )}
                 </div>
+
+                <div className="form-group">
+                  <label htmlFor="status">Product Status</label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <option value="active">Active</option>
+                    <option value="discontinued">Discontinued</option>
+                    <option value="seasonal">Seasonal</option>
+                    <option value="limited">Limited Edition</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="seasonalTrend">Seasonal Trend*</label>
+                <select
+                  id="seasonalTrend"
+                  name="seasonalTrend"
+                  value={formData.seasonalTrend}
+                  onChange={handleChange}
+                  className={errors.seasonalTrend ? "error" : ""}
+                >
+                  <option value="stable">Stable (Year-round)</option>
+                  <option value="winter-high">Winter High Demand</option>
+                  <option value="summer-high">Summer High Demand</option>
+                  <option value="spring-high">Spring High Demand</option>
+                  <option value="fall-high">Fall High Demand</option>
+                  <option value="holiday">Holiday Seasonal</option>
+                </select>
+                {errors.seasonalTrend && (
+                  <div className="error-message">{errors.seasonalTrend}</div>
+                )}
+              </div>
+            </div>
+
+            <div className="form-column">
+              <div className="form-group">
+                <label htmlFor="description">Product Description</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows="4"
+                  value={formData.description}
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="ingredients">Ingredients</label>
+                <textarea
+                  id="ingredients"
+                  name="ingredients"
+                  rows="4"
+                  value={formData.ingredients}
+                  onChange={handleChange}
+                ></textarea>
               </div>
 
               <div className="form-group">
@@ -284,44 +325,41 @@ const AddProduct = () => {
               </div>
 
               <div className="form-group">
+                <label htmlFor="expirationDate">Expiration Date</label>
+                <input
+                  type="date"
+                  id="expirationDate"
+                  name="expirationDate"
+                  value={formData.expirationDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
                 <label htmlFor="image">Product Image</label>
-                <div className="image-upload-container">
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                {previewImage && (
                   <div className="image-preview">
-                    {previewImage ? (
-                      <img src={previewImage} alt="Product preview" />
-                    ) : (
-                      <div className="no-image">
-                        <i className="fas fa-image"></i>
-                        <span>No image selected</span>
-                      </div>
-                    )}
+                    <img src={previewImage} alt="Product preview" />
                   </div>
-                  <input
-                    type="file"
-                    id="image"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  <button type="button" className="btn-upload">
-                    <i className="fas fa-upload"></i> Upload Image
-                  </button>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
           <div className="form-actions">
-            <button
-              type="button"
-              className="btn-cancel"
-              onClick={() => navigate("/products")}
-            >
+            <button type="submit" className="btn-submit" disabled={loading}>
+              {loading ? "Adding..." : "Add Product"}
+            </button>
+            <Link to="/products" className="btn-cancel">
               Cancel
-            </button>
-            <button type="submit" className="btn-save" disabled={loading}>
-              {loading ? "Saving..." : "Save Product"}
-            </button>
+            </Link>
           </div>
         </form>
       </div>

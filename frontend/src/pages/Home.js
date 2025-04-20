@@ -12,7 +12,7 @@ const Home = () => {
       <section className="hero">
         <div className="hero-content">
           <h1>Welcome to InvenTrack</h1>
-          <p>A Powerful Inventory Management Solution for Your Business</p>
+          <p>Pet Food Seasonal Trend Forecasting to Optimize Your Inventory</p>
           {user ? (
             <Link to="/dashboard" className="cta-button">
               Go to Dashboard
@@ -36,12 +36,12 @@ const Home = () => {
         <div className="feature-cards">
           <div className="feature-card">
             <div className="feature-icon">
-              <i className="fas fa-box-open"></i>
+              <i className="fas fa-chart-line"></i>
             </div>
-            <h3>Inventory Management</h3>
+            <h3>Seasonal Trend Forecasting</h3>
             <p>
-              Easily track and manage your inventory with real-time updates and
-              alerts.
+              Predict pet food demand patterns based on historical seasonal data
+              to optimize inventory levels.
             </p>
           </div>
 
@@ -51,19 +51,19 @@ const Home = () => {
             </div>
             <h3>Analytics Dashboard</h3>
             <p>
-              Get insights into your business with comprehensive analytics and
-              reporting.
+              Get insights into seasonal pet food trends with comprehensive
+              analytics and visual reporting.
             </p>
           </div>
 
           <div className="feature-card">
             <div className="feature-icon">
-              <i className="fas fa-bell"></i>
+              <i className="fas fa-dolly-flatbed"></i>
             </div>
-            <h3>Low Stock Alerts</h3>
+            <h3>Stock Optimization</h3>
             <p>
-              Never run out of stock with automatic alerts when inventory is
-              running low.
+              Reduce unsold pet food inventory and optimize storage with
+              data-driven stocking recommendations.
             </p>
           </div>
         </div>
@@ -76,10 +76,10 @@ const Home = () => {
           <div className="step">
             <div className="step-number">1</div>
             <div className="step-content">
-              <h3>Add Your Products</h3>
+              <h3>Input Your Pet Food Products</h3>
               <p>
-                Input your product details, set stock thresholds, and categorize
-                your inventory.
+                Add your pet food catalog with details on product lines,
+                seasonal patterns, and storage requirements.
               </p>
             </div>
           </div>
@@ -87,17 +87,21 @@ const Home = () => {
           <div className="step">
             <div className="step-number">2</div>
             <div className="step-content">
-              <h3>Track Inventory Changes</h3>
-              <p>Update inventory as items are sold or new stock arrives.</p>
+              <h3>Track Seasonal Sales Data</h3>
+              <p>
+                Record historical pet food sales data to identify seasonal
+                patterns and trends.
+              </p>
             </div>
           </div>
 
           <div className="step">
             <div className="step-number">3</div>
             <div className="step-content">
-              <h3>Monitor Analytics</h3>
+              <h3>Implement Forecasted Recommendations</h3>
               <p>
-                View reports and analytics to make informed business decisions.
+                Use our AI-powered seasonal predictions to optimize your pet
+                food inventory and reduce waste.
               </p>
             </div>
           </div>
@@ -107,10 +111,10 @@ const Home = () => {
       {/* Call to Action */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2>Ready to Optimize Your Inventory Management?</h2>
+          <h2>Ready to Optimize Your Pet Food Inventory?</h2>
           <p>
-            Join thousands of businesses that use InvenTrack to streamline their
-            operations.
+            Join leading pet food brands that use InvenTrack to reduce waste and
+            maximize seasonal sales opportunities.
           </p>
           {user ? (
             <Link to="/dashboard" className="cta-button">
@@ -129,7 +133,7 @@ const Home = () => {
         <div className="footer-content">
           <div className="footer-logo">
             <h3>InvenTrack</h3>
-            <p>Inventory Management Simplified</p>
+            <p>Pet Food Seasonal Trend Forecasting</p>
           </div>
 
           <div className="footer-links">
@@ -155,7 +159,7 @@ const Home = () => {
                   <a href="#docs">Documentation</a>
                 </li>
                 <li>
-                  <a href="#guides">Guides</a>
+                  <a href="#guides">Seasonal Guides</a>
                 </li>
                 <li>
                   <a href="#support">Support</a>

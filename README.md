@@ -1,15 +1,15 @@
-# InvenTrack - Inventory Management System
+# InvenTrack - Pet Food Seasonal Trend Forecasting
 
-InvenTrack is a comprehensive inventory management system that helps businesses track and manage their inventory efficiently. The application includes features like product management, low stock notifications, analytics dashboard, and more.
+InvenTrack is a specialized inventory management system designed for pet food brands to forecast seasonal trends and optimize inventory levels. The application helps reduce unsold stock by providing data-driven insights into pet food demand patterns throughout the year.
 
 ## Features
 
-- User Authentication and Authorization
-- Product Management
-- Inventory Tracking
-- Low Stock Alerts
+- Seasonal Trend Forecasting for Pet Food Products
+- Pet Food Product Management
+- Inventory Optimization Recommendations
+- Seasonal Risk Monitoring
 - Dashboard Analytics
-- Notification System
+- Visual Reporting
 - Responsive Design
 
 ## Tech Stack
@@ -103,21 +103,29 @@ inventrack/
 - `GET /api/auth/profile` - Get user profile
 - `PUT /api/auth/profile` - Update user profile
 
-### Products
+### Pet Food Products
 
-- `GET /api/products` - Get all products
+- `GET /api/products` - Get all pet food products
 - `GET /api/products/:id` - Get a single product
 - `POST /api/products` - Create a new product (admin only)
 - `PUT /api/products/:id` - Update a product (admin only)
 - `DELETE /api/products/:id` - Delete a product (admin only)
 
-### Notifications
+### Seasonal Forecasts
 
-- `GET /api/notifications` - Get all notifications for the user
-- `PUT /api/notifications/:id` - Mark a notification as read
-- `PUT /api/notifications/mark-all` - Mark all notifications as read
-- `POST /api/notifications` - Create a notification (admin only)
-- `DELETE /api/notifications/:id` - Delete a notification (admin only)
+- `GET /api/forecasts` - Get all seasonal forecasts
+- `GET /api/forecasts/:season` - Get forecasts for a specific season
+- `GET /api/forecasts/products/:productId` - Get forecasts for a specific product
+- `POST /api/forecasts` - Create a new forecast (admin only)
+
+## How It Works
+
+InvenTrack helps pet food brands optimize their inventory by:
+
+1. **Historical Data Analysis**: Tracking sales patterns across seasons to identify trends
+2. **Seasonal Forecasting**: Predicting future demand based on historical patterns
+3. **Risk Monitoring**: Identifying products at risk of overstocking or stockouts
+4. **Optimization Recommendations**: Providing specific inventory adjustments to maximize sales and minimize waste
 
 ## Contributing
 
