@@ -3,21 +3,21 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { Provider } from "react-redux";
-import store from "./redux/store";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
+// Import Bootstrap CSS
+import "bootstrap/dist/css/bootstrap.min.css";
+
+// Add Font Awesome for icons
+const script = document.createElement("script");
+script.src = "https://kit.fontawesome.com/a076d05399.js";
+script.crossOrigin = "anonymous";
+document.head.appendChild(script);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <>
-    <Provider store={store}>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    </Provider>
-    <ToastContainer />
-  </>
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

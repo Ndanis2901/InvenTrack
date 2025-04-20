@@ -1,35 +1,43 @@
-import express from "express";
-import dotenv from "dotenv";
-import {db} from "./db/db.js";
-import morgan from "morgan";
-import helmet from "helmet";
-import userRoutes from "./routes/userRoutes.js";
-import { errorHandler, routeNotFound } from "./utils/errorHandler.js";
-import cookieParser from "cookie-parser";
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const path = require("path");
 
+// Import routes
+const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/products");
+const notificationRoutes = require("./routes/notifications");
+
+// Load environment variables
 dotenv.config();
+
 const app = express();
-const port = process.env.PORT || 5050;
 
-
-db();
-
-app.get('/', (req, res) => {
-    res.send(`<h1>welcomef to node</h1>`);
-});
-
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(helmet());
-app.use(cookieParser());
 
-if(process.env.MODE_ENV !== "production") {
-    app.use(morgan("dev"));
+// Connect to MongoDB
+mongoose
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/inventrackDB")
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+// Serve static assets in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/build", "index.html"));
+  });
 }
 
-app.use("/api/users", userRoutes);
+const PORT = process.env.PORT || 5000;
 
-app.use('/*', routeNotFound);
-app.use(errorHandler);
-
-app.listen(port, console.log(`app is running on ${port}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
