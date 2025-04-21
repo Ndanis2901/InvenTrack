@@ -47,7 +47,14 @@ exports.createProduct = async (req, res) => {
       supplier,
       image,
       status,
+      // Additional fields from frontend
+      seasonalTrend,
+      expirationDate,
+      ingredients,
+      location,
     } = req.body;
+
+    console.log("Received product data:", req.body); // Debug log
 
     // Check if product with same SKU already exists
     const productExists = await Product.findOne({ sku });
@@ -57,20 +64,37 @@ exports.createProduct = async (req, res) => {
         .json({ message: "Product with this SKU already exists" });
     }
 
-    const product = await Product.create({
+    // Default values for missing required fields
+    const productData = {
       name,
       sku,
       category,
-      description,
-      price,
-      costPrice,
-      quantity,
-      lowStockThreshold,
-      supplier,
+      description: description || "",
+      price: price || 0,
+      costPrice: costPrice || price * 0.7, // Default to 70% of price if not provided
+      quantity: quantity || 0,
+      lowStockThreshold: lowStockThreshold || 10,
+      supplier: supplier || "Default Supplier",
       image,
-      status,
+      status: status || "active",
       createdBy: req.user._id,
-    });
+      // Store additional fields that might not be in the schema directly
+      seasonalTrend,
+      expirationDate,
+      ingredients,
+      location,
+      // Additional metadata if needed
+      metadata: {
+        seasonalTrend,
+        expirationDate,
+        ingredients,
+        location,
+      },
+    };
+
+    console.log("Creating product with data:", productData); // Debug log
+
+    const product = await Product.create(productData);
 
     if (product) {
       res.status(201).json(product);
@@ -78,6 +102,7 @@ exports.createProduct = async (req, res) => {
       res.status(400).json({ message: "Invalid product data" });
     }
   } catch (error) {
+    console.error("Product creation error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -99,6 +124,11 @@ exports.updateProduct = async (req, res) => {
       supplier,
       image,
       status,
+      // Additional fields
+      seasonalTrend,
+      expirationDate,
+      ingredients,
+      location,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -130,6 +160,19 @@ exports.updateProduct = async (req, res) => {
       product.image = image || product.image;
       product.status = status || product.status;
 
+      // Update additional fields if they exist in the schema
+      if (seasonalTrend) product.seasonalTrend = seasonalTrend;
+      if (expirationDate) product.expirationDate = expirationDate;
+      if (ingredients) product.ingredients = ingredients;
+      if (location) product.location = location;
+
+      // Update metadata
+      product.metadata = product.metadata || {};
+      if (seasonalTrend) product.metadata.seasonalTrend = seasonalTrend;
+      if (expirationDate) product.metadata.expirationDate = expirationDate;
+      if (ingredients) product.metadata.ingredients = ingredients;
+      if (location) product.metadata.location = location;
+
       const updatedProduct = await product.save();
 
       // Create low stock notification if quantity falls below threshold
@@ -152,6 +195,7 @@ exports.updateProduct = async (req, res) => {
       res.status(404).json({ message: "Product not found" });
     }
   } catch (error) {
+    console.error("Product update error:", error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -114,12 +114,26 @@ const AddProduct = () => {
 
     if (!validateForm()) return;
 
-    // Convert numeric strings to numbers
+    // Convert numeric strings to numbers and prepare data for backend
     const productData = {
-      ...formData,
+      name: formData.name,
+      sku: formData.sku,
+      category: formData.category,
+      description: formData.description,
       price: parseFloat(formData.price),
+      // Add costPrice field required by backend model
+      costPrice: parseFloat(formData.price) * 0.7, // Example: 70% of selling price
       quantity: parseInt(formData.quantity),
       lowStockThreshold: parseInt(formData.lowStockThreshold),
+      // Map frontend fields to backend expected fields
+      supplier: "Default Supplier", // You could add this field to your form
+      status: formData.status,
+      image: formData.image,
+      // Additional fields from your form
+      seasonalTrend: formData.seasonalTrend,
+      expirationDate: formData.expirationDate,
+      ingredients: formData.ingredients,
+      location: formData.location,
     };
 
     try {

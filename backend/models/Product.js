@@ -42,8 +42,35 @@ const ProductSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["active", "inactive"],
+    enum: ["active", "inactive", "discontinued", "seasonal", "limited"],
     default: "active",
+  },
+  // Add fields for the additional data from frontend
+  seasonalTrend: {
+    type: String,
+    enum: [
+      "stable",
+      "winter-high",
+      "summer-high",
+      "spring-high",
+      "fall-high",
+      "holiday",
+    ],
+    default: "stable",
+  },
+  expirationDate: {
+    type: Date,
+  },
+  ingredients: {
+    type: String,
+  },
+  location: {
+    type: String,
+  },
+  // Store any other custom fields
+  metadata: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

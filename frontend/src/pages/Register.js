@@ -1,6 +1,8 @@
+// File: frontend/src/pages/Register.js
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { UserContext } from "../context/UserContext"; // Add this import
 import "../assets/styles/Auth.css";
 
 const Register = () => {
@@ -10,6 +12,7 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formError, setFormError] = useState("");
   const { registerUser, user, loading, error } = useContext(AuthContext);
+  const { refreshUsers } = useContext(UserContext); // Add this line
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +44,8 @@ const Register = () => {
 
     try {
       await registerUser({ name, email, password });
+      // Refresh the users list in case an admin created this account
+      refreshUsers();
       // Redirect handled by useEffect
     } catch (err) {
       setFormError(err.message || "Registration failed. Please try again.");

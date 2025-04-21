@@ -7,7 +7,7 @@ import "../assets/styles/ProductForm.css";
 const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { getProductById, updateProduct, loading } = useContext(ProductContext);
+  const { fetchProductById, editProduct, loading } = useContext(ProductContext);
   const [categories, setCategories] = useState([
     "Electronics",
     "Clothing",
@@ -37,7 +37,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const product = await getProductById(id);
+        const product = await fetchProductById(id);
 
         if (product) {
           setOriginalProduct(product);
@@ -70,7 +70,7 @@ const EditProduct = () => {
     };
 
     fetchProduct();
-  }, [id, getProductById]);
+  }, [id, fetchProductById]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,10 +136,11 @@ const EditProduct = () => {
       price: parseFloat(formData.price),
       quantity: parseInt(formData.quantity),
       lowStockThreshold: parseInt(formData.lowStockThreshold),
+      costPrice: parseFloat(formData.price) * 0.7, // Add costPrice if it's required
     };
 
     try {
-      await updateProduct(id, productData);
+      await editProduct(id, productData);
       navigate(`/products/${id}`);
     } catch (error) {
       console.error("Failed to update product:", error);

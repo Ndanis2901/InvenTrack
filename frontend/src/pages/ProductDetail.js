@@ -7,7 +7,8 @@ import "../assets/styles/ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { getProductById, loading, removeProduct } = useContext(ProductContext);
+  const { fetchProductById, loading, removeProduct } =
+    useContext(ProductContext);
   const { user } = useContext(AuthContext);
   const [product, setProduct] = useState(null);
   const [stockHistory, setStockHistory] = useState([
@@ -18,12 +19,16 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const productData = await getProductById(id);
-      setProduct(productData);
+      try {
+        const productData = await fetchProductById(id);
+        setProduct(productData);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
     };
 
     fetchProduct();
-  }, [id, getProductById]);
+  }, [id, fetchProductById]);
 
   const handleDelete = () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
