@@ -1,17 +1,18 @@
 // File: frontend/src/pages/Users.js
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { UserContext } from "../context/UserContext"; // Add this import
+import { UserContext } from "../context/UserContext";
 import Layout from "../components/Layout";
 import "../assets/styles/Products.css";
 
 const Users = () => {
   const { user } = useContext(AuthContext);
-  const { users, loading, deleteUser, refreshUsers } = useContext(UserContext); // Use UserContext
+  const { users, loading, error, deleteUser, refreshUsers } =
+    useContext(UserContext);
 
   // Refresh users when component mounts
-  React.useEffect(() => {
+  useEffect(() => {
     refreshUsers();
   }, [refreshUsers]);
 
@@ -57,6 +58,13 @@ const Users = () => {
 
         {loading ? (
           <div className="loading">Loading...</div>
+        ) : error ? (
+          <div className="error-message">
+            <i className="fas fa-exclamation-circle"></i> {error}
+            <button onClick={refreshUsers} className="btn-retry">
+              Try Again
+            </button>
+          </div>
         ) : (
           <div className="products-table-container">
             <table className="products-table">
@@ -69,7 +77,7 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody>
-                {users.length > 0 ? (
+                {users && users.length > 0 ? (
                   users.map((u) => (
                     <tr key={u._id}>
                       <td>{u.name}</td>

@@ -1,15 +1,15 @@
 // File: frontend/src/pages/AddUser.js
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
+import { UserContext } from "../context/UserContext";
 import Layout from "../components/Layout";
 import "../assets/styles/ProductForm.css"; // Reuse the ProductForm CSS
 
 const AddUser = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
+  const { addUser } = useContext(UserContext);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -64,14 +64,7 @@ const AddUser = () => {
 
     setLoading(true);
     try {
-      const token = user.token;
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      await axios.post(`${API_URL}/users`, formData, config);
+      await addUser(formData);
       navigate("/users");
     } catch (error) {
       console.error("Failed to add user:", error);
@@ -96,65 +89,74 @@ const AddUser = () => {
           </div>
         </div>
 
-        <form className="product-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="product-form">
           {errors.submit && (
-            <div className="form-error-message">{errors.submit}</div>
+            <div className="error-message form-error">{errors.submit}</div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="name">Name*</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={errors.name ? "error" : ""}
-            />
-            {errors.name && <div className="error-message">{errors.name}</div>}
-          </div>
+          <div className="form-section">
+            <h2>User Information</h2>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="name">Full Name*</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={errors.name ? "error" : ""}
+                />
+                {errors.name && (
+                  <div className="error-message">{errors.name}</div>
+                )}
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email*</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={errors.email ? "error" : ""}
-            />
-            {errors.email && (
-              <div className="error-message">{errors.email}</div>
-            )}
-          </div>
+              <div className="form-group">
+                <label htmlFor="email">Email Address*</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={errors.email ? "error" : ""}
+                />
+                {errors.email && (
+                  <div className="error-message">{errors.email}</div>
+                )}
+              </div>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password*</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={errors.password ? "error" : ""}
-            />
-            {errors.password && (
-              <div className="error-message">{errors.password}</div>
-            )}
-          </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="password">Password*</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={errors.password ? "error" : ""}
+                />
+                {errors.password && (
+                  <div className="error-message">{errors.password}</div>
+                )}
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="role">Role*</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
+              <div className="form-group">
+                <label htmlFor="role">User Role</label>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                >
+                  <option value="user">Regular User</option>
+                  <option value="admin">Administrator</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div className="form-actions">

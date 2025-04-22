@@ -235,3 +235,49 @@
 .btn-refresh:hover {
   background-color: #5a6268;
 }
+
+/* Loading state */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.2rem;
+}
+
+/* Error message */
+.error-message {
+  background-color: #fee;
+  border: 1px solid #f99;
+  border-radius: 4px;
+  color: #c33;
+  margin: 20px 0;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+}
+
+.error-message i {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.btn-retry {
+  margin-left: auto;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-retry:hover {
+  background-color: #f9f9f9;
+  border-color: #ccc;
+}
+
+.form-error {
+  margin-bottom: 20px;
+}

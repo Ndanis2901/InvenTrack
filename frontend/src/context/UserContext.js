@@ -16,12 +16,16 @@ export const UserProvider = ({ children }) => {
   // Function to fetch all users
   const fetchUsers = async () => {
     if (!user || user.role !== "admin") {
+      console.log("User not admin or not logged in, skipping fetch");
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
+      console.log("Fetching users from:", `${API_URL}/users`);
+      console.log("With token:", user.token);
+
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -29,19 +33,26 @@ export const UserProvider = ({ children }) => {
       };
 
       const response = await axios.get(`${API_URL}/users`, config);
+      console.log("Users API response:", response);
+
       setUsers(response.data);
       setLoading(false);
     } catch (error) {
-      setError(error.message || "Failed to fetch users");
+      console.error("Error fetching users:", error);
+      console.error("Error details:", error.response || error.message);
+      setError(error.response?.data?.message || "Failed to fetch users");
       setLoading(false);
     }
   };
 
   // Load users when component mounts or user changes
   useEffect(() => {
+    console.log("UserContext useEffect triggered, user:", user);
     if (user && user.role === "admin") {
+      console.log("User is admin, fetching users");
       fetchUsers();
     } else {
+      console.log("User not admin or not logged in");
       setUsers([]);
       setLoading(false);
     }
@@ -51,6 +62,8 @@ export const UserProvider = ({ children }) => {
   const addUser = async (userData) => {
     try {
       setLoading(true);
+      console.log("Adding user:", userData);
+
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -58,11 +71,15 @@ export const UserProvider = ({ children }) => {
       };
 
       const response = await axios.post(`${API_URL}/users`, userData, config);
+      console.log("Add user response:", response);
+
       setUsers([...users, response.data]);
       setLoading(false);
       return response.data;
     } catch (error) {
-      setError(error.message || "Failed to add user");
+      console.error("Error adding user:", error);
+      console.error("Error details:", error.response || error.message);
+      setError(error.response?.data?.message || "Failed to add user");
       setLoading(false);
       throw error;
     }
@@ -72,6 +89,8 @@ export const UserProvider = ({ children }) => {
   const updateUser = async (id, userData) => {
     try {
       setLoading(true);
+      console.log("Updating user:", id, userData);
+
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
@@ -83,11 +102,15 @@ export const UserProvider = ({ children }) => {
         userData,
         config
       );
+      console.log("Update user response:", response);
+
       setUsers(users.map((u) => (u._id === id ? response.data : u)));
       setLoading(false);
       return response.data;
     } catch (error) {
-      setError(error.message || "Failed to update user");
+      console.error("Error updating user:", error);
+      console.error("Error details:", error.response || error.message);
+      setError(error.response?.data?.message || "Failed to update user");
       setLoading(false);
       throw error;
     }
@@ -97,17 +120,23 @@ export const UserProvider = ({ children }) => {
   const deleteUser = async (id) => {
     try {
       setLoading(true);
+      console.log("Deleting user:", id);
+
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       };
 
-      await axios.delete(`${API_URL}/users/${id}`, config);
+      const response = await axios.delete(`${API_URL}/users/${id}`, config);
+      console.log("Delete user response:", response);
+
       setUsers(users.filter((u) => u._id !== id));
       setLoading(false);
     } catch (error) {
-      setError(error.message || "Failed to delete user");
+      console.error("Error deleting user:", error);
+      console.error("Error details:", error.response || error.message);
+      setError(error.response?.data?.message || "Failed to delete user");
       setLoading(false);
       throw error;
     }
@@ -115,6 +144,7 @@ export const UserProvider = ({ children }) => {
 
   // Manually refresh users
   const refreshUsers = () => {
+    console.log("Manual refresh triggered");
     fetchUsers();
   };
 

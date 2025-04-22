@@ -10,7 +10,7 @@ const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 const notificationRoutes = require("./routes/notifications");
 const categoriesRoutes = require("./routes/categories");
-const usersRoutes = require("./routes/users"); // Add this import
+const usersRoutes = require("./routes/users");
 
 // Load environment variables
 dotenv.config();
@@ -32,7 +32,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/categories", categoriesRoutes);
-app.use("/api/users", usersRoutes); // Add this line
+app.use("/api/users", usersRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === "production") {
