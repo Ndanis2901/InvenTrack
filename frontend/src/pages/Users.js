@@ -1,5 +1,5 @@
-// File: frontend/src/pages/Users.js
-import React, { useContext, useEffect } from "react";
+// frontend/src/pages/Users.js
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { UserContext } from "../context/UserContext";
@@ -10,21 +10,38 @@ const Users = () => {
   const { user } = useContext(AuthContext);
   const { users, loading, error, deleteUser, refreshUsers } =
     useContext(UserContext);
+  const [deleteError, setDeleteError] = useState(null);
+  const [apiError, setApiError] = useState(null);
 
   // Refresh users when component mounts
   useEffect(() => {
-    refreshUsers();
-  }, [refreshUsers]);
+    if (user && user.role === "admin") {
+      handleRefresh();
+    }
+  }, [user]);
+
+  const handleRefresh = async () => {
+    try {
+      setApiError(null);
+      await refreshUsers();
+    } catch (err) {
+      console.error("Error refreshing users:", err);
+      setApiError(`Failed to load users: ${err.message || "Unknown error"}`);
+    }
+  };
 
   // Handle delete user
   const handleDeleteUser = async (userId) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
+    setDeleteError(null);
     try {
       await deleteUser(userId);
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      alert("Failed to delete user. Please try again.");
+      // Refresh the list after deletion
+      handleRefresh();
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      setDeleteError(err.message || "Failed to delete user. Please try again.");
     }
   };
 
@@ -47,7 +64,7 @@ const Users = () => {
         <div className="page-header">
           <h1>System Users</h1>
           <div className="header-actions">
-            <button onClick={refreshUsers} className="btn-refresh">
+            <button onClick={handleRefresh} className="btn-refresh">
               <i className="fas fa-sync-alt"></i> Refresh
             </button>
             <Link to="/users/add" className="btn-add">
@@ -56,12 +73,95 @@ const Users = () => {
           </div>
         </div>
 
+        {apiError && (
+          <div
+            className="error-message"
+            style={{
+              padding: "10px",
+              marginBottom: "10px",
+              backgroundColor: "#ffe6e6",
+              border: "1px solid #ff9999",
+              borderRadius: "4px",
+            }}
+          >
+            <i className="fas fa-exclamation-circle"></i> {apiError}
+            <button
+              onClick={() => {
+                setApiError(null);
+                handleRefresh();
+              }}
+              className="btn-retry"
+              style={{
+                marginLeft: "10px",
+                padding: "3px 8px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #ddd",
+                borderRadius: "3px",
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {deleteError && (
+          <div
+            className="error-message"
+            style={{
+              padding: "10px",
+              marginBottom: "10px",
+              backgroundColor: "#ffe6e6",
+              border: "1px solid #ff9999",
+              borderRadius: "4px",
+            }}
+          >
+            <i className="fas fa-exclamation-circle"></i> {deleteError}
+            <button
+              onClick={() => setDeleteError(null)}
+              className="btn-retry"
+              style={{
+                marginLeft: "10px",
+                padding: "3px 8px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #ddd",
+                borderRadius: "3px",
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {loading ? (
-          <div className="loading">Loading...</div>
+          <div
+            className="loading"
+            style={{ textAlign: "center", padding: "20px" }}
+          >
+            <i className="fas fa-spinner fa-spin"></i> Loading users...
+          </div>
         ) : error ? (
-          <div className="error-message">
+          <div
+            className="error-message"
+            style={{
+              padding: "10px",
+              marginBottom: "10px",
+              backgroundColor: "#ffe6e6",
+              border: "1px solid #ff9999",
+              borderRadius: "4px",
+            }}
+          >
             <i className="fas fa-exclamation-circle"></i> {error}
-            <button onClick={refreshUsers} className="btn-retry">
+            <button
+              onClick={handleRefresh}
+              className="btn-retry"
+              style={{
+                marginLeft: "10px",
+                padding: "3px 8px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #ddd",
+                borderRadius: "3px",
+              }}
+            >
               Try Again
             </button>
           </div>
@@ -87,7 +187,7 @@ const Users = () => {
                         <Link to={`/users/edit/${u._id}`} className="btn-edit">
                           <i className="fas fa-edit"></i>
                         </Link>
-                        {u._id !== user._id && (
+                        {user && u._id !== user._id && (
                           <button
                             className="btn-delete"
                             onClick={() => handleDeleteUser(u._id)}
