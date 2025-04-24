@@ -1,19 +1,23 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ProductContext } from "../context/ProductContext";
+import axios from "axios";
 import Layout from "../components/Layout";
 import "../assets/styles/ProductForm.css";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { fetchProductById, editProduct, loading } = useContext(ProductContext);
-  const [categories, setCategories] = useState([
-    "Electronics",
-    "Clothing",
-    "Home Goods",
-    "Office Supplies",
-    "Food & Beverage",
+  const [categories] = useState([
+    "Dry Dog Food",
+    "Wet Dog Food",
+    "Dry Cat Food",
+    "Wet Cat Food",
+    "Puppy Food",
+    "Kitten Food",
+    "Senior Pet Food",
+    "Pet Treats",
+    "Prescription Diet",
+    "Organic Pet Food",
   ]);
 
   const [formData, setFormData] = useState({
@@ -27,6 +31,10 @@ const EditProduct = () => {
     location: "",
     status: "active",
     image: "",
+    seasonalTrend: "stable",
+    costPrice: "",
+    expirationDate: "",
+    ingredients: "",
   });
 
   const [originalProduct, setOriginalProduct] = useState(null);
@@ -34,43 +42,72 @@ const EditProduct = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Load product directly from API
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const product = await fetchProductById(id);
+        // Get user token
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || !user.token) {
+          throw new Error("You must be logged in");
+        }
 
-        if (product) {
-          setOriginalProduct(product);
-
-          // Format the data for the form
-          setFormData({
-            name: product.name || "",
-            sku: product.sku || "",
-            category: product.category || "",
-            price: product.price?.toString() || "",
-            quantity: product.quantity?.toString() || "",
-            lowStockThreshold: product.lowStockThreshold?.toString() || "5",
-            description: product.description || "",
-            location: product.location || "",
-            status: product.status || "active",
-            image: product.image || "",
-          });
-
-          if (product.image) {
-            setPreviewImage(product.image);
+        const response = await axios.get(
+          `http://localhost:5001/api/products/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
           }
+        );
+
+        const product = response.data;
+        setOriginalProduct(product);
+
+        // Set form data
+        setFormData({
+          name: product.name || "",
+          sku: product.sku || "",
+          category: product.category || "",
+          price: product.price !== undefined ? product.price.toString() : "",
+          quantity:
+            product.quantity !== undefined ? product.quantity.toString() : "",
+          lowStockThreshold: product.lowStockThreshold
+            ? product.lowStockThreshold.toString()
+            : "5",
+          description: product.description || "",
+          location: product.location || "",
+          status: product.status || "active",
+          image: product.image || "",
+          seasonalTrend: product.seasonalTrend || "stable",
+          costPrice: product.costPrice ? product.costPrice.toString() : "",
+          expirationDate: product.expirationDate
+            ? new Date(product.expirationDate).toISOString().split("T")[0]
+            : "",
+          ingredients: product.ingredients || "",
+        });
+
+        if (product.image) {
+          setPreviewImage(product.image);
         }
 
         setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching product:", error);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setErrors({
+          fetch:
+            err.response?.data?.message ||
+            err.message ||
+            "Failed to load product data",
+        });
         setIsLoading(false);
-        setErrors({ fetch: "Failed to load product data. Please try again." });
       }
     };
 
-    fetchProduct();
-  }, [id, fetchProductById]);
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -130,21 +167,41 @@ const EditProduct = () => {
 
     if (!validateForm()) return;
 
-    // Convert numeric strings to numbers
-    const productData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      quantity: parseInt(formData.quantity),
-      lowStockThreshold: parseInt(formData.lowStockThreshold),
-      costPrice: parseFloat(formData.price) * 0.7, // Add costPrice if it's required
-    };
-
     try {
-      await editProduct(id, productData);
+      setIsLoading(true);
+
+      // Get user token
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || !user.token) {
+        throw new Error("You must be logged in");
+      }
+
+      // Convert numeric strings to numbers
+      const productData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        quantity: parseInt(formData.quantity),
+        lowStockThreshold: parseInt(formData.lowStockThreshold),
+        costPrice: parseFloat(formData.price) * 0.7, // Add costPrice if it's required
+      };
+
+      // Update product via API
+      await axios.put(`http://localhost:5001/api/products/${id}`, productData, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
       navigate(`/products/${id}`);
-    } catch (error) {
-      console.error("Failed to update product:", error);
-      setErrors({ submit: "Failed to update product. Please try again." });
+    } catch (err) {
+      console.error("Failed to update product:", err);
+      setErrors({
+        submit:
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to update product",
+      });
+      setIsLoading(false);
     }
   };
 
@@ -156,7 +213,21 @@ const EditProduct = () => {
     );
   }
 
-  if (!originalProduct && !isLoading) {
+  if (errors.fetch) {
+    return (
+      <Layout>
+        <div className="product-not-found">
+          <h2>Error Loading Product</h2>
+          <p>{errors.fetch}</p>
+          <Link to="/products" className="btn-back">
+            Return to Products
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!originalProduct) {
     return (
       <Layout>
         <div className="product-not-found">
@@ -185,9 +256,6 @@ const EditProduct = () => {
         <form className="product-form" onSubmit={handleSubmit}>
           {errors.submit && (
             <div className="form-error-message">{errors.submit}</div>
-          )}
-          {errors.fetch && (
-            <div className="form-error-message">{errors.fetch}</div>
           )}
 
           <div className="form-columns">
@@ -272,6 +340,8 @@ const EditProduct = () => {
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                     <option value="discontinued">Discontinued</option>
+                    <option value="seasonal">Seasonal</option>
+                    <option value="limited">Limited</option>
                   </select>
                 </div>
               </div>
@@ -285,6 +355,23 @@ const EditProduct = () => {
                   value={formData.description}
                   onChange={handleChange}
                 ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="seasonalTrend">Seasonal Trend</label>
+                <select
+                  id="seasonalTrend"
+                  name="seasonalTrend"
+                  value={formData.seasonalTrend}
+                  onChange={handleChange}
+                >
+                  <option value="stable">Stable (Year-round)</option>
+                  <option value="winter-high">Winter High Demand</option>
+                  <option value="summer-high">Summer High Demand</option>
+                  <option value="spring-high">Spring High Demand</option>
+                  <option value="fall-high">Fall High Demand</option>
+                  <option value="holiday">Holiday Seasonal</option>
+                </select>
               </div>
             </div>
 
@@ -337,6 +424,28 @@ const EditProduct = () => {
               </div>
 
               <div className="form-group">
+                <label htmlFor="ingredients">Ingredients</label>
+                <textarea
+                  id="ingredients"
+                  name="ingredients"
+                  rows="4"
+                  value={formData.ingredients}
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="expirationDate">Expiration Date</label>
+                <input
+                  type="date"
+                  id="expirationDate"
+                  name="expirationDate"
+                  value={formData.expirationDate}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="form-group">
                 <label htmlFor="image">Product Image</label>
                 <div className="image-upload-container">
                   <div className="image-preview">
@@ -355,8 +464,13 @@ const EditProduct = () => {
                     name="image"
                     accept="image/*"
                     onChange={handleImageChange}
+                    style={{ display: "none" }}
                   />
-                  <button type="button" className="btn-upload">
+                  <button
+                    type="button"
+                    className="btn-upload"
+                    onClick={() => document.getElementById("image").click()}
+                  >
                     <i className="fas fa-upload"></i>{" "}
                     {previewImage ? "Change Image" : "Upload Image"}
                   </button>
@@ -373,8 +487,8 @@ const EditProduct = () => {
             >
               Cancel
             </button>
-            <button type="submit" className="btn-save" disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
+            <button type="submit" className="btn-save" disabled={isLoading}>
+              {isLoading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

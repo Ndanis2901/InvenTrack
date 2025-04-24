@@ -23,10 +23,12 @@ export const ProductProvider = ({ children }) => {
       if (user) {
         try {
           setLoading(true);
+          setError(null);
           const data = await getProducts();
           setProducts(data);
           setLoading(false);
         } catch (error) {
+          console.error("Failed to fetch products:", error);
           setError(error.message || "Failed to fetch products");
           setLoading(false);
         }
@@ -43,13 +45,15 @@ export const ProductProvider = ({ children }) => {
   const fetchProductById = async (id) => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getProductById(id);
       setLoading(false);
       return data;
     } catch (error) {
+      console.error("Failed to fetch product:", error);
       setError(error.message || "Failed to fetch product");
       setLoading(false);
-      throw error;
+      throw new Error(error.message || "Failed to fetch product");
     }
   };
 
@@ -57,14 +61,16 @@ export const ProductProvider = ({ children }) => {
   const addProduct = async (productData) => {
     try {
       setLoading(true);
+      setError(null);
       const newProduct = await createProduct(productData);
       setProducts([...products, newProduct]);
       setLoading(false);
       return newProduct;
     } catch (error) {
+      console.error("Failed to create product:", error);
       setError(error.message || "Failed to create product");
       setLoading(false);
-      throw error;
+      throw new Error(error.message || "Failed to create product");
     }
   };
 
@@ -72,14 +78,16 @@ export const ProductProvider = ({ children }) => {
   const editProduct = async (id, productData) => {
     try {
       setLoading(true);
+      setError(null);
       const updatedProduct = await updateProduct(id, productData);
       setProducts(products.map((p) => (p._id === id ? updatedProduct : p)));
       setLoading(false);
       return updatedProduct;
     } catch (error) {
+      console.error("Failed to update product:", error);
       setError(error.message || "Failed to update product");
       setLoading(false);
-      throw error;
+      throw new Error(error.message || "Failed to update product");
     }
   };
 
@@ -87,13 +95,16 @@ export const ProductProvider = ({ children }) => {
   const removeProduct = async (id) => {
     try {
       setLoading(true);
+      setError(null);
       await deleteProduct(id);
       setProducts(products.filter((p) => p._id !== id));
       setLoading(false);
+      return { success: true };
     } catch (error) {
+      console.error("Failed to delete product:", error);
       setError(error.message || "Failed to delete product");
       setLoading(false);
-      throw error;
+      throw new Error(error.message || "Failed to delete product");
     }
   };
 
@@ -119,3 +130,5 @@ export const ProductProvider = ({ children }) => {
     </ProductContext.Provider>
   );
 };
+
+export default ProductContext;

@@ -1,40 +1,83 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ProductContext } from "../context/ProductContext";
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 import Layout from "../components/Layout";
 import "../assets/styles/ProductDetail.css";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { fetchProductById, loading, removeProduct } =
-    useContext(ProductContext);
-  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
-  const [stockHistory, setStockHistory] = useState([
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [stockHistory] = useState([
     { date: "2023-04-15", change: -5, reason: "Order #1024" },
     { date: "2023-04-10", change: 20, reason: "Inventory restocking" },
     { date: "2023-04-01", change: -2, reason: "Order #1018" },
   ]);
 
+  // Load product directly from API
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const productData = await fetchProductById(id);
-        setProduct(productData);
-      } catch (error) {
-        console.error("Error fetching product:", error);
+        setLoading(true);
+        // Get user token
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || !user.token) {
+          throw new Error("You must be logged in");
+        }
+
+        const response = await axios.get(
+          `http://localhost:5001/api/products/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
+
+        setProduct(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError(
+          err.response?.data?.message || err.message || "Failed to load product"
+        );
+        setLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [id, fetchProductById]);
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
 
-  const handleDelete = () => {
+  // Handle product deletion
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      removeProduct(id);
-      // Navigate back to products page
-      window.location.href = "/products";
+      try {
+        // Get user token
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user || !user.token) {
+          throw new Error("You must be logged in");
+        }
+
+        await axios.delete(`http://localhost:5001/api/products/${id}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        navigate("/products");
+      } catch (err) {
+        console.error("Error deleting product:", err);
+        alert(
+          `Failed to delete product: ${
+            err.response?.data?.message || err.message || "Unknown error"
+          }`
+        );
+      }
     }
   };
 
@@ -54,7 +97,21 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="loading">Loading...</div>
+        <div className="loading">Loading product details...</div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="product-not-found">
+          <h2>Error Loading Product</h2>
+          <p>{error}</p>
+          <Link to="/products" className="btn-back">
+            Return to Products
+          </Link>
+        </div>
       </Layout>
     );
   }
@@ -73,6 +130,10 @@ const ProductDetail = () => {
     );
   }
 
+  // Check if user is admin
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAdmin = user && user.role === "admin";
+
   return (
     <Layout>
       <div className="product-detail-page">
@@ -83,7 +144,7 @@ const ProductDetail = () => {
             </Link>
             <h1>{product.name}</h1>
           </div>
-          {user && user.role === "admin" && (
+          {isAdmin && (
             <div className="header-actions">
               <Link to={`/products/edit/${id}`} className="btn-edit">
                 <i className="fas fa-edit"></i> Edit

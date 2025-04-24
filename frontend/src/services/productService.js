@@ -19,7 +19,12 @@ export const getProducts = async () => {
     const response = await axios.get(`${API_URL}/products`, getAuthHeader());
     return response.data;
   } catch (error) {
-    throw error.response.data;
+    console.error("Get products error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error, please try again" };
+    }
   }
 };
 
@@ -32,7 +37,12 @@ export const getProductById = async (id) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response.data;
+    console.error("Get product by ID error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error, please try again" };
+    }
   }
 };
 
@@ -46,7 +56,12 @@ export const createProduct = async (productData) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response.data;
+    console.error("Create product error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error, please try again" };
+    }
   }
 };
 
@@ -60,7 +75,12 @@ export const updateProduct = async (id, productData) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response.data;
+    console.error("Update product error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error, please try again" };
+    }
   }
 };
 
@@ -73,6 +93,11 @@ export const deleteProduct = async (id) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response.data;
+    console.error("Delete product error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else {
+      throw { message: "Network error, please try again" };
+    }
   }
 };
