@@ -144,16 +144,23 @@ const ProductDetail = () => {
             </Link>
             <h1>{product.name}</h1>
           </div>
-          {isAdmin && (
-            <div className="header-actions">
-              <Link to={`/products/edit/${id}`} className="btn-edit">
-                <i className="fas fa-edit"></i> Edit
-              </Link>
-              <button className="btn-delete" onClick={handleDelete}>
-                <i className="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          )}
+          <div className="header-actions">
+            {/* Add the Forecast button */}
+            <Link to={`/products/forecast/${id}`} className="btn-forecast">
+              <i className="fas fa-chart-line"></i> View Forecast
+            </Link>
+
+            {isAdmin && (
+              <>
+                <Link to={`/products/edit/${id}`} className="btn-edit">
+                  <i className="fas fa-edit"></i> Edit
+                </Link>
+                <button className="btn-delete" onClick={handleDelete}>
+                  <i className="fas fa-trash"></i> Delete
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="product-detail-content">
@@ -220,6 +227,12 @@ const ProductDetail = () => {
                     {product.location || "Not specified"}
                   </span>
                 </div>
+                <div className="info-row">
+                  <span className="label">Seasonal Trend:</span>
+                  <span className="value">
+                    {product.seasonalTrend || "Stable"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -228,6 +241,13 @@ const ProductDetail = () => {
             <div className="description-section">
               <h3>Description</h3>
               <p>{product.description || "No description available."}</p>
+
+              {product.ingredients && (
+                <>
+                  <h4>Ingredients</h4>
+                  <p>{product.ingredients}</p>
+                </>
+              )}
             </div>
 
             <div className="stock-history-section">

@@ -256,3 +256,29 @@
     grid-template-columns: 1fr;
   }
 } 
+
+.btn-forecast {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  background-color: #5469d4;
+  color: white;
+  text-decoration: none;
+  border: none;
+  margin-right: 10px;
+}
+
+.btn-forecast:hover {
+  background-color: #4054b2;
+}
+
+/* Adjust the header-actions layout to accommodate the new button */
+.header-actions {
+  display: flex;
+  gap: 10px;
+}

@@ -17,9 +17,11 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import ProductForecast from "./pages/ProductForecast"; // Add this import
 import Categories from "./pages/Categories";
 import Users from "./pages/Users";
 import AddUser from "./pages/AddUser";
+import EditUser from "./pages/EditUser";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -29,7 +31,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 // Styles
 import "./App.css";
-import EditUser from "./pages/EditUser"; // Add this line
+import "./assets/styles/Forecast.css"; // Add this import
 
 function App() {
   return (
@@ -51,11 +53,15 @@ function App() {
                   <Route path="/products/:id" element={<ProductDetail />} />
                   <Route path="/products/add" element={<AddProduct />} />
                   <Route path="/products/edit/:id" element={<EditProduct />} />
+                  {/* Add the new Forecast route */}
+                  <Route
+                    path="/products/forecast/:id"
+                    element={<ProductForecast />}
+                  />
                   <Route path="/categories" element={<Categories />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/users/add" element={<AddUser />} />
-                  <Route path="/users/edit/:id" element={<EditUser />} />{" "}
-                  {/* Add this line */}
+                  <Route path="/users/edit/:id" element={<EditUser />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
